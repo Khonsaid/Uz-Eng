@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:checkable="true"
+        android:id="@+id/choiceScreen"
+        android:icon="@drawable/icon_bookmark"
+        android:title="избранное" />
+    <item
+        android:checkable="true"
+        android:id="@+id/photoScreen"
+        android:icon="@drawable/ic_camera"
+        android:title="фото" />
+
+    <item
+        android:checkable="true"
+        android:id="@+id/dialogScreen"
+        android:icon="@drawable/icon_dialog"
+        android:title="диалог" />
+
+    <item android:title="Other Options">
+        <menu>
+            <item
+                android:checkable="true"
+                android:id="@+id/homeScreen"
+                android:icon="@drawable/icon_home"
+                android:title="текст" />
+            <item
+                android:checkable="true"
+                android:id="@+id/historyScreen"
+                android:icon="@drawable/icon_history"
+                android:title="история" />
+        </menu>
+    </item>
+
+</menu>

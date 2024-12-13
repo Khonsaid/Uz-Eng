@@ -89,4 +89,6 @@ dependencies {
     // hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-compiler:2.51.1")
+    // Balloon
+    implementation("com.github.skydoves:balloon:1.3.3")
 }

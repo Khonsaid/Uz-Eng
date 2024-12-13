@@ -2,13 +2,11 @@ package uz.gita.latizx.uz_eng.util
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import java.util.Locale
 
-class TextToSpeechHealer(
-    context: Context,
-    private val language: Locale = Locale.UK
-) : TextToSpeech.OnInitListener {
-    private var tts: TextToSpeech? = null
+class TextToSpeechHealer(context: Context, private val language: Locale = Locale.UK) : TextToSpeech.OnInitListener {
+    var tts: TextToSpeech? = null
     private var isReady = false
 
     init {
@@ -22,8 +20,21 @@ class TextToSpeechHealer(
         }
     }
 
-    fun speak(text: String) {
-        if (isReady) tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    fun speak(text: String, onStop: (() -> Unit)? = null) {
+        if (isReady) {
+            tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {}
+                override fun onDone(utteranceId: String?) {
+                    onStop?.invoke()
+                }
+
+                override fun onError(utteranceId: String?) {
+                    onStop?.invoke()
+                }
+            })
+
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+        }
     }
 
     fun setSpeechRate(rate: Float = 1f) {

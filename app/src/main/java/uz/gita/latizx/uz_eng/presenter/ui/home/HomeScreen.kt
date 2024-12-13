@@ -1,53 +1,49 @@
 package uz.gita.latizx.uz_eng.presenter.ui.home
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.snackbar.Snackbar
+import com.skydoves.balloon.Balloon
+import com.skydoves.balloon.BalloonAnimation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.gita.latizx.uz_eng.R
 import uz.gita.latizx.uz_eng.databinding.ScreenHomeBinding
 import uz.gita.latizx.uz_eng.presenter.ui.home.adapter.WordAdapter
 import uz.gita.latizx.uz_eng.util.SpeechToTextHelper
-import uz.gita.latizx.uz_eng.util.TextToSpeechHealer
 import uz.gita.latizx.uz_eng.util.copyToClipBoard
-import java.util.Locale
 
 @AndroidEntryPoint
 class HomeScreen : Fragment(R.layout.screen_home) {
     private val binding by viewBinding(ScreenHomeBinding::bind)
     private val viewModel: HomeViewModel by viewModels<HomeViewModelImpl>()
     private val wordAdapter by lazy { WordAdapter() }
-    private lateinit var ttsHelper: TextToSpeechHealer
     private lateinit var speechToTextHelper: SpeechToTextHelper
+    private val REQUEST_CODE = 100
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        ttsHelper = TextToSpeechHealer(requireContext(), Locale.UK)
-        speechToTextHelper = SpeechToTextHelper(requireContext())
-        binding.fbHome.setOnClickListener {
-            speechToTextHelper.startListening { results ->
-                if (results.isNotEmpty()) {
-                    binding.searchView.setText(results[0])
-                    viewModel.searchByWord(results[0])
-                }
-            }
-        }
+        speechToTextHelper = SpeechToTextHelper(requireContext(), binding.fbHome)
+
         binding.apply {
             navView.setNavigationItemSelectedListener { menuItem ->
 //                MenuItem.setChecked = true
                 drawerLayout.close()
-
                 if (menuItem.itemId == R.id.m_paste) viewModel.clickPaste()
-
                 return@setNavigationItemSelectedListener true
             }
         }
+        setupFloatingBalloon()
         observers()
         settingsSearching()
         settingsAdapter()
@@ -59,9 +55,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             searchBar.setNavigationOnClickListener { drawerLayout.open() }
             searchBar.setOnMenuItemClickListener { itemMenu ->
                 when (itemMenu.itemId) {
-                    R.id.m_paste -> {
-                        viewModel.clickPaste()
-                    }
+                    R.id.m_paste -> viewModel.clickPaste()
                 }
                 return@setOnMenuItemClickListener true
             }
@@ -76,7 +70,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             }
             searchView.editText.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
-                    binding.searchBar.setText("") // Matnni tozalaymiz
+                    searchBar.setText("") // Matnni tozalaymiz
                 }
             }
         }
@@ -88,13 +82,8 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             rvHome.adapter = wordAdapter
 
             wordAdapter.apply {
-                setCopyClickListener {
-                    it?.english?.copyToClipBoard(requireContext())
-                    Snackbar.make(binding.root, "${it?.english} copied", Snackbar.LENGTH_SHORT).show()
-                }
-                setShareClickListener { }
-                setSlowlyClickListener { data -> data?.english?.let { viewModel.ttSlowlySpeech(it) } }
-                setTTSClickLikeListener { data -> data?.english?.let { viewModel.ttSpeech(it) } }
+                setCopyClickListener { it?.english?.copyToClipBoard(requireContext()) }
+                setShareClickListener { shareText(it?.english) }
                 setSaveClickLikeListener { data -> data?.let { viewModel.updateFav(it.id, it.isFavourite!!) } }
             }
         }
@@ -111,19 +100,54 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         }
         lifecycleScope.launch {
             launch { viewModel.cursor.collect { wordAdapter.submitCursor(it) } }
-            launch {
-                viewModel.ttSpeech.collect {
-                    ttsHelper.setPitch()
-                    ttsHelper.setSpeechRate()
-                    ttsHelper.speak(it)
+            launch { viewModel.searchQuery.collect { wordAdapter.searchQuery(it) } }
+        }
+    }
+
+    private fun setupFloatingBalloon() {
+        val balloon = Balloon.Builder(requireContext())
+            .setText("Voice search activated!")
+            .setTextColorResource(R.color.black)
+            .setBackgroundColorResource(R.color.toast)
+            .setTextSize(14f)
+            .setPadding(8)
+            .setCornerRadius(8f)
+            .setBalloonAnimation(BalloonAnimation.FADE)
+            .setDismissWhenClicked(true)
+            .setDismissWhenTouchOutside(true)
+            .setAutoDismissDuration(4000L) // 2 soniya o'tib avtomatik o'chadi
+            .build()
+
+        binding.fbHome.setOnClickListener {
+            checkAudioPermission()
+            balloon.showAlignTop(binding.fbHome)
+
+            speechToTextHelper.startListening { results ->
+                if (results.isNotEmpty()) {
+                    balloon.dismiss()
+                    binding.searchView.setText(results[0])
+                    viewModel.searchByWord(results[0])
                 }
             }
-            launch {
-                viewModel.ttSlowlySpeech.collect {
-                    ttsHelper.setPitch(0.6f)
-                    ttsHelper.setSpeechRate(0.5f)
-                    ttsHelper.speak(it)
-                }
+        }
+    }
+
+    private fun shareText(text: String?) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text.toString())
+        }
+        requireContext().startActivity(Intent.createChooser(shareIntent, "Share"))
+    }
+
+    private fun checkAudioPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // M = 23
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_CODE)
             }
         }
     }
@@ -143,9 +167,6 @@ class HomeScreen : Fragment(R.layout.screen_home) {
 
     override fun onPause() {
         super.onPause()
-        ttsHelper.stop()
-        ttsHelper.shutdown()
-
         speechToTextHelper.stopListening()
         speechToTextHelper.destroy()
     }

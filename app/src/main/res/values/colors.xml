@@ -3,7 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#007AFF</color>
-    <color name="primary_60">#60007AFF</color>
+    <color name="primary_60">#E6007AFF</color>
+    <color name="toast">#D4D1FD</color>
+    <color name="ll_word">#FCDBD2</color>
     <color name="body_primary">#131313</color>
     <color name="body_secondary">#D7D7D7</color>
     <color name="border_divider">#F2F2F2</color>

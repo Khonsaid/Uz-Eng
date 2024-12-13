@@ -2,41 +2,77 @@ package uz.gita.latizx.uz_eng.presenter.ui.home.adapter
 
 import android.annotation.SuppressLint
 import android.database.Cursor
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
+import com.skydoves.balloon.ArrowOrientation
+import com.skydoves.balloon.Balloon
 import uz.gita.latizx.uz_eng.R
+import uz.gita.latizx.uz_eng.data.mapper.Mapper.toDictionaryModel
 import uz.gita.latizx.uz_eng.data.model.DictionaryModel
 import uz.gita.latizx.uz_eng.databinding.ItemWordBinding
 import uz.gita.latizx.uz_eng.presenter.ui.home.adapter.WordAdapter.WordViewHolder
-import uz.gita.latizx.uz_eng.util.animateScaleAndRotate
+import uz.gita.latizx.uz_eng.util.TextToSpeechHealer
+import uz.gita.latizx.uz_eng.util.highlightSearch
+import uz.gita.latizx.uz_eng.util.startScaleAnim
+import uz.gita.latizx.uz_eng.util.stopScaleAnim
+import java.util.Locale
 
 class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
     private var cursor: Cursor? = null
     private var lastOpened = -1
     private var isEng = true
+    private var searchQuery = ""
     private var onShareClickListener: ((DictionaryModel?) -> Unit)? = null
     private var onSaveClickListener: ((DictionaryModel?) -> Unit)? = null
     private var onCopyClickListener: ((DictionaryModel?) -> Unit)? = null
-    private var onTTSClickListener: ((DictionaryModel?) -> Unit)? = null
-    private var onSlowlyTTSClickListener: ((DictionaryModel?) -> Unit)? = null
+    private lateinit var ttsHelper: TextToSpeechHealer
+    private lateinit var balloon: Balloon
 
     inner class WordViewHolder(private val binding: ItemWordBinding) : RecyclerView.ViewHolder(binding.root) {
-
         init {
+            ttsHelper = TextToSpeechHealer(binding.root.context, Locale.UK)
             binding.apply {
-                btnCopy.setOnClickListener { onCopyClickListener?.invoke(getItem(adapterPosition)) }
+                btnCopy.setOnClickListener {
+                    val data = getItem(adapterPosition)
+                    onCopyClickListener?.invoke(data)
+                    balloon = Balloon.Builder(binding.root.context)
+                        .setText("${data?.english} copied")
+                        .setTextSize(12f)
+                        .setTextColorResource(R.color.black)
+                        .setBackgroundColorResource(R.color.toast)
+                        .setArrowSize(10)
+                        .setArrowPosition(0.5f)
+                        .setArrowOrientation(ArrowOrientation.TOP)
+                        .setCornerRadius(8f)
+                        .setPadding(8)
+                        .setAutoDismissDuration(1500L)
+                        .setMargin(4)
+                        .build()
+
+                    balloon.showAlignTop(binding.btnCopy)
+//                    it.postDelayed({ balloon.dismiss() }, 1200)
+                }
                 btnFast.setOnClickListener {
-                    onTTSClickListener?.invoke(getItem(adapterPosition))
-                    btnFast.animateScaleAndRotate()
+                    btnFast.startScaleAnim()
+                    ttsHelper.setPitch(1f)
+                    ttsHelper.setSpeechRate(1f)
+                    ttsHelper.speak(
+                        text = getItem(adapterPosition)?.english.toString(),
+                        onStop = { btnFast.stopScaleAnim() }
+                    )
                 }
                 btnShare.setOnClickListener { onShareClickListener?.invoke(getItem(adapterPosition)) }
                 btnSlowly.setOnClickListener {
-                    onSlowlyTTSClickListener?.invoke(getItem(adapterPosition))
-                    btnSlowly.animateScaleAndRotate()
+                    btnSlowly.startScaleAnim()
+                    ttsHelper.setPitch(0.6f)
+                    ttsHelper.setSpeechRate(0.5f)
+                    ttsHelper.speak(
+                        text = getItem(adapterPosition)?.english.toString(),
+                        onStop = { btnSlowly.stopScaleAnim() }
+                    )
                 }
                 btnSave.setOnClickListener {
                     binding.btnSave.isSelected = getItem(adapterPosition)?.isFavourite == 1
@@ -48,6 +84,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
                     if (lastOpened != -1) notifyItemChanged(lastOpened, Unit)
                     lastOpened = adapterPosition
                 } else lastOpened = -1
+
                 changeVisibility(lastOpened == adapterPosition)
                 notifyItemChanged(adapterPosition, Unit)
             }
@@ -55,11 +92,16 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
 
         fun bind(dictionaryModel: DictionaryModel) {
             binding.apply {
-                tvWord.text = if (isEng) dictionaryModel.english else dictionaryModel.uzbek
+                val fullText = if (isEng) dictionaryModel.english else dictionaryModel.uzbek
+
+                if (searchQuery.isEmpty()) tvWord.text = fullText
+                else tvWord.highlightSearch(fullText ?: "", searchQuery)
+
                 tvTrans.text = if (isEng) dictionaryModel.uzbek else dictionaryModel.english
                 tvType.text = dictionaryModel.type
                 tvTranscript.text = dictionaryModel.transcript
                 btnSave.isSelected = dictionaryModel.isFavourite == 1
+
                 if (adapterPosition == lastOpened) changeVisibility(true)
                 else changeVisibility(false)
             }
@@ -71,7 +113,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
             binding.apply {
                 if (isVisible) root.startAnimation(downAnim)
                 else root.startAnimation(upAnim)
-
+                llTitle.isSelected = isVisible
                 tvType.visibility = if (isVisible) View.VISIBLE else View.GONE
                 tvTranscript.visibility = if (isVisible) View.VISIBLE else View.GONE
                 tvTrans.visibility = if (isVisible) View.VISIBLE else View.GONE
@@ -83,48 +125,24 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
         WordViewHolder(ItemWordBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
-        cursor?.let {
-            it.moveToPosition(position)
-            val id = it.getInt(it.getColumnIndexOrThrow("id"))
-            val english = it.getString(it.getColumnIndexOrThrow("english"))
-            val uzbek = it.getString(it.getColumnIndexOrThrow("uzbek"))
-            val type = it.getString(it.getColumnIndexOrThrow("type"))
-            val transcript = it.getString(it.getColumnIndexOrThrow("transcript"))
-            val countable = it.getString(it.getColumnIndexOrThrow("countable"))
-            val isFavourite = it.getInt(it.getColumnIndexOrThrow("is_favourite"))
-            holder.bind(
-                DictionaryModel(
-                    id = id, english = english, uzbek = uzbek, type = type, transcript = transcript, countable = countable,
-                    isFavourite = isFavourite, from = "", date = System.currentTimeMillis(),
-                )
-            )
+        cursor?.let { cursor ->
+            cursor.moveToPosition(position)
+            holder.bind(cursor.toDictionaryModel())
         }
     }
 
     override fun getItemCount(): Int = cursor?.count ?: 0
 
     private fun getItem(position: Int): DictionaryModel? {
-        cursor?.let {
-            if (it.moveToPosition(position)) {
-                val id = it.getInt(it.getColumnIndexOrThrow("id"))
-                val english = it.getString(it.getColumnIndexOrThrow("english"))
-                val uzbek = it.getString(it.getColumnIndexOrThrow("uzbek"))
-                val type = it.getString(it.getColumnIndexOrThrow("type"))
-                val transcript = it.getString(it.getColumnIndexOrThrow("transcript"))
-                val countable = it.getString(it.getColumnIndexOrThrow("countable"))
-                val isFavourite = it.getInt(it.getColumnIndexOrThrow("is_favourite"))
-                return DictionaryModel(
-                    id = id, english = english, uzbek = uzbek, type = type, transcript = transcript, countable = countable,
-                    isFavourite = isFavourite, from = "", date = System.currentTimeMillis(),
-                )
-            }
+        cursor?.let { cursor ->
+            if (cursor.moveToPosition(position))
+                return cursor.toDictionaryModel()
         }
         return null
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun submitCursor(cursor: Cursor?) {
-        Log.d("TTT", "submitCursor: ${cursor?.count}")
         this.cursor = cursor
         notifyDataSetChanged()
     }
@@ -147,11 +165,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
         onCopyClickListener = listener
     }
 
-    fun setTTSClickLikeListener(like: (DictionaryModel?) -> Unit) {
-        onTTSClickListener = like
-    }
-
-    fun setSlowlyClickListener(listener: (DictionaryModel?) -> Unit) {
-        onSlowlyTTSClickListener = listener
+    fun searchQuery(text: String) {
+        searchQuery = text
     }
 }

@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uz.gita.latizx.uz_eng.domain.AppRepository
@@ -23,8 +22,7 @@ class HomeViewModelImpl @Inject constructor(
 ) : HomeViewModel, ViewModel() {
     override val pasteData = MutableLiveData<String>()
     override val cursor = MutableStateFlow<Cursor?>(null)
-    override val ttSpeech = MutableSharedFlow<String>()
-    override val ttSlowlySpeech = MutableSharedFlow<String>()
+    override val searchQuery = MutableStateFlow<String>("")
     override val isEng = MutableLiveData<Boolean>(true)
 
     init {
@@ -36,6 +34,7 @@ class HomeViewModelImpl @Inject constructor(
     override fun searchByWord(word: String) {
         viewModelScope.launch {
             cursor.value = if (isEng.value!!) repository.searchByEngWord(word) else repository.searchByUzbWord(word)
+            searchQuery.value = word
         }
     }
 
@@ -55,14 +54,6 @@ class HomeViewModelImpl @Inject constructor(
 
     override fun clickPaste() {
         pasteData.value = getClipboardText()
-    }
-
-    override fun ttSpeech(word: String) {
-        viewModelScope.launch { ttSpeech.emit(word) }
-    }
-
-    override fun ttSlowlySpeech(word: String) {
-        viewModelScope.launch { ttSlowlySpeech.emit(word) }
     }
 
     private fun getClipboardText(): String? {

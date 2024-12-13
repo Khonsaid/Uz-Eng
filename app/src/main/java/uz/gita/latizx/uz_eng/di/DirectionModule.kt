@@ -8,6 +8,8 @@ import uz.gita.latizx.uz_eng.presenter.ui.detail.DetailContract
 import uz.gita.latizx.uz_eng.presenter.ui.detail.DetailDirectionImpl
 import uz.gita.latizx.uz_eng.presenter.ui.history.HistoryContract
 import uz.gita.latizx.uz_eng.presenter.ui.history.HistoryDirectionImpl
+import uz.gita.latizx.uz_eng.presenter.ui.home.HomeContract
+import uz.gita.latizx.uz_eng.presenter.ui.home.HomeDirectionImpl
 import uz.gita.latizx.uz_eng.presenter.ui.info.InfoContract
 import uz.gita.latizx.uz_eng.presenter.ui.info.InfoDirectionImpl
 
@@ -24,4 +26,6 @@ interface DirectionModule {
     @Binds
     fun bindInfoDirection(impl: InfoDirectionImpl): InfoContract.InfoDirection
 
+    @Binds
+    fun bindHomeDirection(impl: HomeDirectionImpl): HomeContract.HomeDirection
 }

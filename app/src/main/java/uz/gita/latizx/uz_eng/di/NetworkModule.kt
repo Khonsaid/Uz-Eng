@@ -11,26 +11,27 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import uz.gita.latizx.uz_eng.BuildConfig
+import uz.gita.latizx.uz_eng.data.source.remote.api.DictionaryApi
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-    @Provides
-    @Singleton
+    @[Provides Singleton]
     fun provideChucker(@ApplicationContext context: Context): ChuckerInterceptor = ChuckerInterceptor.Builder(context).build()
 
-    @Provides
-    @Singleton
+    @[Provides Singleton]
     fun provideOkHttp(chuckerInterceptor: ChuckerInterceptor): OkHttpClient =
         OkHttpClient.Builder().addInterceptor(chuckerInterceptor).build()
 
-    @Provides
-    @Singleton
+    @[Provides Singleton]
     fun provideClient(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .client(okHttpClient)
         .build()
+
+    @[Provides Singleton]
+    fun provideDictionaryApi(retrofit: Retrofit): DictionaryApi = retrofit.create(DictionaryApi::class.java)
 }

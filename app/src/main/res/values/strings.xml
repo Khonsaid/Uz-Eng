@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Uz-Eng</string>
+    <string name="antonyms">Antonyms :</string>
+    <string name="synonyms">Synonyms :</string>
+    <string name="definitions">Definitions :</string>
+    <string name="something_went_wrong_check_the_internet">Something went wrong, check the internet</string>
 </resources>

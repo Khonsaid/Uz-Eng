@@ -8,6 +8,19 @@
     <fragment
         android:id="@+id/homeScreen"
         android:name="uz.gita.latizx.uz_eng.presenter.ui.home.HomeScreen"
-        tools:layout="@layout/screen_home"
-        android:label="HomeScreen" />
+        android:label="HomeScreen"
+        tools:layout="@layout/screen_home">
+        <action
+            android:id="@+id/action_homeScreen_to_detailScreen"
+            app:destination="@id/detailScreen" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailScreen"
+        android:name="uz.gita.latizx.uz_eng.presenter.ui.detail.DetailScreen"
+        android:label="DetailScreen"
+        tools:layout="@layout/screen_detail" >
+        <argument
+            android:name="idData"
+            app:argType="integer" />
+    </fragment>
 </navigation>

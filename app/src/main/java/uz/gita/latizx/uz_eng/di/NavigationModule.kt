@@ -13,8 +13,8 @@ import uz.gita.latizx.uz_eng.presenter.navigator.AppNavigator
 interface NavigationModule {
 
     @Binds
-    fun bindAppNavigator(disputer: AppNavigationDisputer): AppNavigator
+    fun bindAppNavigator(dispatcher: AppNavigationDisputer): AppNavigator
 
     @Binds
-    fun bindAppNavigationHolder(disputer: AppNavigationDisputer): AppNavigationHolder
+    fun bindAppNavigationHolder(dispatcher: AppNavigationDisputer): AppNavigationHolder
 }

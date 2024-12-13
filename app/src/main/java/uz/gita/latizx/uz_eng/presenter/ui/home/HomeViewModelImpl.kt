@@ -12,20 +12,22 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import uz.gita.latizx.uz_eng.data.model.DictionaryModel
 import uz.gita.latizx.uz_eng.domain.AppRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModelImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val repository: AppRepository
-) : HomeViewModel, ViewModel() {
+    private val repository: AppRepository,
+    private val direction: HomeContract.HomeDirection
+) : HomeContract.HomeViewModel, ViewModel() {
     override val pasteData = MutableLiveData<String>()
     override val cursor = MutableStateFlow<Cursor?>(null)
     override val searchQuery = MutableStateFlow<String>("")
     override val isEng = MutableLiveData<Boolean>(true)
 
-    init {
+    override fun getCursor() {
         viewModelScope.launch {
             cursor.value = getCursorByLang()
         }
@@ -54,6 +56,10 @@ class HomeViewModelImpl @Inject constructor(
 
     override fun clickPaste() {
         pasteData.value = getClipboardText()
+    }
+
+    override fun clickDetail(dictionaryModel: DictionaryModel) {
+        viewModelScope.launch { direction.moveToDetail(dictionaryModel) }
     }
 
     private fun getClipboardText(): String? {

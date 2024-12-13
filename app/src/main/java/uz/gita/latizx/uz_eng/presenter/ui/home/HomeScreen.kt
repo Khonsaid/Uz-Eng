@@ -1,7 +1,6 @@
 package uz.gita.latizx.uz_eng.presenter.ui.home
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -23,21 +22,22 @@ import uz.gita.latizx.uz_eng.databinding.ScreenHomeBinding
 import uz.gita.latizx.uz_eng.presenter.ui.home.adapter.WordAdapter
 import uz.gita.latizx.uz_eng.util.SpeechToTextHelper
 import uz.gita.latizx.uz_eng.util.copyToClipBoard
+import uz.gita.latizx.uz_eng.util.shareText
 
 @AndroidEntryPoint
 class HomeScreen : Fragment(R.layout.screen_home) {
     private val binding by viewBinding(ScreenHomeBinding::bind)
-    private val viewModel: HomeViewModel by viewModels<HomeViewModelImpl>()
+    private val viewModel: HomeContract.HomeViewModel by viewModels<HomeViewModelImpl>()
     private val wordAdapter by lazy { WordAdapter() }
     private lateinit var speechToTextHelper: SpeechToTextHelper
     private val REQUEST_CODE = 100
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         speechToTextHelper = SpeechToTextHelper(requireContext(), binding.fbHome)
+        viewModel.getCursor()
 
         binding.apply {
             navView.setNavigationItemSelectedListener { menuItem ->
-//                MenuItem.setChecked = true
                 drawerLayout.close()
                 if (menuItem.itemId == R.id.m_paste) viewModel.clickPaste()
                 return@setNavigationItemSelectedListener true
@@ -69,9 +69,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
                 false
             }
             searchView.editText.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) {
-                    searchBar.setText("") // Matnni tozalaymiz
-                }
+                if (!hasFocus) resetSearchView()
             }
         }
     }
@@ -83,8 +81,9 @@ class HomeScreen : Fragment(R.layout.screen_home) {
 
             wordAdapter.apply {
                 setCopyClickListener { it?.english?.copyToClipBoard(requireContext()) }
-                setShareClickListener { shareText(it?.english) }
+                setShareClickListener { requireActivity().shareText(it?.english) }
                 setSaveClickLikeListener { data -> data?.let { viewModel.updateFav(it.id, it.isFavourite!!) } }
+                setDetailClickListener { data -> data?.let { viewModel.clickDetail(it) } }
             }
         }
     }
@@ -99,7 +98,15 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             }
         }
         lifecycleScope.launch {
-            launch { viewModel.cursor.collect { wordAdapter.submitCursor(it) } }
+            launch {
+                viewModel.cursor.collect {
+                    binding.apply {
+                        imgSearch.visibility = if ((it?.count ?: 0) > 0) View.GONE else View.VISIBLE
+                        tvSearch.visibility = if ((it?.count ?: 0) > 0) View.GONE else View.VISIBLE
+                    }
+                    wordAdapter.submitCursor(it)
+                }
+            }
             launch { viewModel.searchQuery.collect { wordAdapter.searchQuery(it) } }
         }
     }
@@ -115,7 +122,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             .setBalloonAnimation(BalloonAnimation.FADE)
             .setDismissWhenClicked(true)
             .setDismissWhenTouchOutside(true)
-            .setAutoDismissDuration(4000L) // 2 soniya o'tib avtomatik o'chadi
+            .setAutoDismissDuration(4000L) // 4 soniya o'tib avtomatik o'chadi
             .build()
 
         binding.fbHome.setOnClickListener {
@@ -130,14 +137,6 @@ class HomeScreen : Fragment(R.layout.screen_home) {
                 }
             }
         }
-    }
-
-    private fun shareText(text: String?) {
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, text.toString())
-        }
-        requireContext().startActivity(Intent.createChooser(shareIntent, "Share"))
     }
 
     private fun checkAudioPermission() {
@@ -169,5 +168,14 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         super.onPause()
         speechToTextHelper.stopListening()
         speechToTextHelper.destroy()
+        resetSearchView() // Reset search view when the fragment goes to the background
+    }
+
+    private fun resetSearchView() {
+        binding.apply {
+            searchBar.setText("") // Clear the search bar text
+            searchView.setText("") // Clear the search view text
+            searchView.hide() // Hide the search view
+        }
     }
 }

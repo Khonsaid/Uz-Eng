@@ -1,5 +1,6 @@
 package uz.gita.latizx.uz_eng.presenter.navigator
 
+import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,7 +12,7 @@ class AppNavigationDisputer @Inject constructor() : AppNavigator, AppNavigationH
     override val navigationStack = MutableSharedFlow<NavController.() -> Unit>()
 
     private suspend fun navigate(args: NavigationArgs) {
-        navigationStack.emit { args }
+        navigationStack.emit(args)
     }
 
     override suspend fun navigateTo(id: NavDirections) = navigate { navigate(id) }

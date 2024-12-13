@@ -18,7 +18,7 @@ import uz.gita.latizx.uz_eng.util.TextToSpeechHealer
 import uz.gita.latizx.uz_eng.util.highlightSearch
 import uz.gita.latizx.uz_eng.util.startScaleAnim
 import uz.gita.latizx.uz_eng.util.stopScaleAnim
-import java.util.Locale
+import javax.inject.Inject
 
 class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
     private var cursor: Cursor? = null
@@ -26,14 +26,17 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
     private var isEng = true
     private var searchQuery = ""
     private var onShareClickListener: ((DictionaryModel?) -> Unit)? = null
+    private var onDetailClickListener: ((DictionaryModel?) -> Unit)? = null
     private var onSaveClickListener: ((DictionaryModel?) -> Unit)? = null
     private var onCopyClickListener: ((DictionaryModel?) -> Unit)? = null
-    private lateinit var ttsHelper: TextToSpeechHealer
     private lateinit var balloon: Balloon
+
+    @Inject
+    lateinit var ttsHelper: TextToSpeechHealer
 
     inner class WordViewHolder(private val binding: ItemWordBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
-            ttsHelper = TextToSpeechHealer(binding.root.context, Locale.UK)
+            ttsHelper = TextToSpeechHealer(binding.root.context)
             binding.apply {
                 btnCopy.setOnClickListener {
                     val data = getItem(adapterPosition)
@@ -65,6 +68,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
                     )
                 }
                 btnShare.setOnClickListener { onShareClickListener?.invoke(getItem(adapterPosition)) }
+                btnDocument.setOnClickListener { onDetailClickListener?.invoke(getItem(adapterPosition)) }
                 btnSlowly.setOnClickListener {
                     btnSlowly.startScaleAnim()
                     ttsHelper.setPitch(0.6f)
@@ -163,6 +167,10 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
 
     fun setCopyClickListener(listener: (DictionaryModel?) -> Unit) {
         onCopyClickListener = listener
+    }
+
+    fun setDetailClickListener(listener: (DictionaryModel?) -> Unit) {
+        onDetailClickListener = listener
     }
 
     fun searchQuery(text: String) {

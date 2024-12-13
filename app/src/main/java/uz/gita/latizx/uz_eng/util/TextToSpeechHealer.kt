@@ -3,11 +3,17 @@ package uz.gita.latizx.uz_eng.util
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TextToSpeechHealer(context: Context, private val language: Locale = Locale.UK) : TextToSpeech.OnInitListener {
+@Singleton
+class TextToSpeechHealer @Inject constructor(@ApplicationContext context: Context) :
+    TextToSpeech.OnInitListener {
     var tts: TextToSpeech? = null
     private var isReady = false
+    private val language: Locale = Locale.UK
 
     init {
         tts = TextToSpeech(context, this)

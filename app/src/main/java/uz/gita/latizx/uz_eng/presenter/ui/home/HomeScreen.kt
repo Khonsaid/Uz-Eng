@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -60,6 +61,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         observers()
         settingsSearching()
         settingsAdapter()
+        backPressed()
     }
 
     private fun showToast() {
@@ -165,6 +167,20 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         if (currentFocusedView != null) {
             inputMethodManager.hideSoftInputFromWindow(currentFocusedView.windowToken, 0)
         }
+    }
+
+    private fun backPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.searchView.query.isNotEmpty()) {
+                    binding.searchView.setQuery("", false)
+                    viewModel.getCursor()
+                } else {
+                    isEnabled = false
+                    requireActivity().onBackPressed()
+                }
+            }
+        })
     }
 
     override fun onPause() {

@@ -45,6 +45,7 @@
                     android:layout_gravity="start|center_vertical"
                     android:theme="@style/BaseTheme"
                     app:iconifiedByDefault="false"
+                    app:queryBackground="@android:color/transparent"
                     app:queryHint="Search for a word"
                     app:searchIcon="@null" />
 

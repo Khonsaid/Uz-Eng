@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeScreen">
+    app:startDestination="@id/onboardingScreen">
 
     <fragment
         android:id="@+id/homeScreen"
@@ -43,4 +43,15 @@
         android:name="uz.gita.latizx.uz_eng.presenter.ui.info.InfoScreen"
         android:label="InfoScreen"
         tools:layout="@layout/screen_info" />
+    <fragment
+        android:id="@+id/onboardingScreen"
+        android:name="uz.gita.latizx.uz_eng.presenter.ui.onboarding.OnboardingScreen"
+        android:label="InfoScreen"
+        tools:layout="@layout/screen_onboarding" >
+        <action
+            android:id="@+id/action_onboardingScreen_to_homeScreen"
+            app:destination="@id/homeScreen"
+            app:popUpTo="@id/onboardingScreen"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

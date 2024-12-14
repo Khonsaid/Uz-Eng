@@ -91,4 +91,6 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.51.1")
     // Balloon
     implementation("com.github.skydoves:balloon:1.3.3")
+    //dotsindicator
+    implementation(libs.dotsindicator)
 }

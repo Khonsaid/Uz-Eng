@@ -10,5 +10,12 @@ import javax.inject.Singleton
 class PreferenceHelper @Inject constructor(@ApplicationContext context: Context) {
     private val pref: SharedPreferences = context.getSharedPreferences("local_storage", Context.MODE_PRIVATE)
 
+    companion object {
+        private const val IS_FIRST_LAUNCH = "is_first_launch"
+    }
 
+    fun isFirstLaunch(): Boolean = pref.getBoolean(IS_FIRST_LAUNCH, true)
+    fun setFirstLaunch(isFirst: Boolean) {
+        pref.edit().putBoolean(IS_FIRST_LAUNCH, isFirst).apply()
+    }
 }

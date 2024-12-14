@@ -12,6 +12,8 @@ import uz.gita.latizx.uz_eng.presenter.ui.home.HomeContract
 import uz.gita.latizx.uz_eng.presenter.ui.home.HomeDirectionImpl
 import uz.gita.latizx.uz_eng.presenter.ui.info.InfoContract
 import uz.gita.latizx.uz_eng.presenter.ui.info.InfoDirectionImpl
+import uz.gita.latizx.uz_eng.presenter.ui.onboarding.OnBoardingDirectionImpl
+import uz.gita.latizx.uz_eng.presenter.ui.onboarding.OnboardingContract
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -28,4 +30,7 @@ interface DirectionModule {
 
     @Binds
     fun bindHomeDirection(impl: HomeDirectionImpl): HomeContract.HomeDirection
+
+    @Binds
+    fun bindOnboardingDirection(impl: OnBoardingDirectionImpl): OnboardingContract.OnBoardingDirection
 }

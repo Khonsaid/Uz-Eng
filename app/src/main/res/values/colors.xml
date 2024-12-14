@@ -19,4 +19,7 @@
     <color name="part_of_speech6">#FDE595</color>
     <color name="part_of_speech7">#B3A9FB</color>
     <color name="grey">#898989</color>
+    <color name="color1_onboarding">#007AFF</color>
+    <color name="color2_onboarding">#8A63B3</color>
+    <color name="color3_onboarding">#4CAF50</color>
 </resources>

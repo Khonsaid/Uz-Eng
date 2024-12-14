@@ -3,6 +3,7 @@ package uz.gita.latizx.uz_eng.util
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -53,4 +54,9 @@ fun TextView.highlightSearch(fullText: String, query: String, highlightColor: In
         startIndex = lowerCaseText.indexOf(lowerCaseQuery, startIndex + query.length)
     }
     this.text = spannableString
+}
+
+fun Context.getClipboardText(): String {
+    val clipboard = this.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+    return clipboard.primaryClip?.getItemAt(0)?.text.toString()
 }

@@ -13,14 +13,34 @@
         <action
             android:id="@+id/action_homeScreen_to_detailScreen"
             app:destination="@id/detailScreen" />
+        <action
+            android:id="@+id/action_homeScreen_to_favScreen2"
+            app:destination="@id/favScreen" />
+        <action
+            android:id="@+id/action_homeScreen_to_infoScreen"
+            app:destination="@id/infoScreen" />
     </fragment>
     <fragment
         android:id="@+id/detailScreen"
         android:name="uz.gita.latizx.uz_eng.presenter.ui.detail.DetailScreen"
         android:label="DetailScreen"
-        tools:layout="@layout/screen_detail" >
+        tools:layout="@layout/screen_detail">
         <argument
             android:name="idData"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/favScreen"
+        android:name="uz.gita.latizx.uz_eng.presenter.ui.fav.FavScreen"
+        android:label="HistoryScreen"
+        tools:layout="@layout/screen_fav">
+        <action
+            android:id="@+id/action_historyScreen2_to_detailScreen"
+            app:destination="@id/detailScreen" />
+    </fragment>
+    <fragment
+        android:id="@+id/infoScreen"
+        android:name="uz.gita.latizx.uz_eng.presenter.ui.info.InfoScreen"
+        android:label="InfoScreen"
+        tools:layout="@layout/screen_info" />
 </navigation>

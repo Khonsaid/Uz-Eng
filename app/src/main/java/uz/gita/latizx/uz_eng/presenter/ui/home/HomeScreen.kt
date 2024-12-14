@@ -1,10 +1,13 @@
 package uz.gita.latizx.uz_eng.presenter.ui.home
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -39,10 +42,19 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         binding.apply {
             navView.setNavigationItemSelectedListener { menuItem ->
                 drawerLayout.close()
-                if (menuItem.itemId == R.id.m_paste) viewModel.clickPaste()
-                return@setNavigationItemSelectedListener true
+                when (menuItem.itemId) {
+                    R.id.m_paste -> viewModel.openPaste()
+                    R.id.favScreen -> viewModel.openFav()
+                    R.id.infoScreen -> viewModel.openInfo()
+                    R.id.settingsScreen -> showToast()
+                    R.id.rateApp -> showToast()
+                }
+                return@setNavigationItemSelectedListener false
             }
-            btnDraw.setOnClickListener { drawerLayout.open() }
+            btnDraw.setOnClickListener {
+                drawerLayout.open()
+                hideKeyboard()
+            }
         }
         setupFloatingBalloon()
         observers()
@@ -50,9 +62,13 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         settingsAdapter()
     }
 
+    private fun showToast() {
+        Toast.makeText(requireContext(), "Soon!", Toast.LENGTH_SHORT).show()
+    }
+
     private fun settingsSearching() {
         binding.apply {
-            btnPaste.setOnClickListener { viewModel.clickPaste() }
+            btnPaste.setOnClickListener { viewModel.openPaste() }
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     viewModel.searchByWord(query ?: "")
@@ -80,7 +96,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
                         viewModel.updateFav(it.id, it.isFavourite!!, position)
                     }
                 }
-                setDetailClickListener { data -> data?.let { viewModel.clickDetail(it) } }
+                setDetailClickListener { data -> data?.let { viewModel.openDetail(it) } }
             }
         }
     }
@@ -139,6 +155,15 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             ) {
                 ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_CODE)
             }
+        }
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager =
+            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusedView = requireActivity().currentFocus
+        if (currentFocusedView != null) {
+            inputMethodManager.hideSoftInputFromWindow(currentFocusedView.windowToken, 0)
         }
     }
 

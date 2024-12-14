@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/favScreen"
         android:checkable="true"
-        android:id="@+id/choiceScreen"
         android:icon="@drawable/icon_bookmark"
-        android:title="избранное" />
-    <item
-        android:checkable="true"
-        android:id="@+id/photoScreen"
-        android:icon="@drawable/ic_camera"
-        android:title="фото" />
+        android:title="Favorites" />
+    <!--    <item-->
+    <!--        android:id="@+id/historyScreen"-->
+    <!--        android:checkable="true"-->
+    <!--        android:icon="@drawable/ic_history"-->
+    <!--        android:title="History" />-->
 
     <item
+        android:id="@+id/settingsScreen"
         android:checkable="true"
-        android:id="@+id/dialogScreen"
-        android:icon="@drawable/icon_dialog"
-        android:title="диалог" />
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+
+    <item
+        android:id="@+id/infoScreen"
+        android:checkable="true"
+        android:icon="@drawable/ic_info"
+        android:title="About" />
 
     <item android:title="Other Options">
         <menu>
             <item
+                android:id="@+id/rateApp"
                 android:checkable="true"
-                android:id="@+id/homeScreen"
                 android:icon="@drawable/icon_home"
-                android:title="текст" />
-            <item
-                android:checkable="true"
-                android:id="@+id/historyScreen"
-                android:icon="@drawable/icon_history"
-                android:title="история" />
+                android:title="Rate the app" />
+
         </menu>
     </item>
-
 </menu>

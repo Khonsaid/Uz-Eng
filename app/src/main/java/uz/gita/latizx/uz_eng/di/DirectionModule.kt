@@ -6,8 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import uz.gita.latizx.uz_eng.presenter.ui.detail.DetailContract
 import uz.gita.latizx.uz_eng.presenter.ui.detail.DetailDirectionImpl
-import uz.gita.latizx.uz_eng.presenter.ui.history.HistoryContract
-import uz.gita.latizx.uz_eng.presenter.ui.history.HistoryDirectionImpl
+import uz.gita.latizx.uz_eng.presenter.ui.fav.FavContract
+import uz.gita.latizx.uz_eng.presenter.ui.fav.FavDirectionImpl
 import uz.gita.latizx.uz_eng.presenter.ui.home.HomeContract
 import uz.gita.latizx.uz_eng.presenter.ui.home.HomeDirectionImpl
 import uz.gita.latizx.uz_eng.presenter.ui.info.InfoContract
@@ -21,7 +21,7 @@ interface DirectionModule {
     fun bindDetailDirection(impl: DetailDirectionImpl): DetailContract.DetailDirection
 
     @Binds
-    fun bindHistoryDirection(impl: HistoryDirectionImpl): HistoryContract.HistoryDirection
+    fun bindHistoryDirection(impl: FavDirectionImpl): FavContract.FavDirection
 
     @Binds
     fun bindInfoDirection(impl: InfoDirectionImpl): InfoContract.InfoDirection

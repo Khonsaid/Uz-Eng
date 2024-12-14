@@ -13,8 +13,9 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:backgroundTint="@color/primary">
+            android:layout_height="76dp"
+            android:backgroundTint="@color/primary"
+            android:gravity="center">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/toolbar"

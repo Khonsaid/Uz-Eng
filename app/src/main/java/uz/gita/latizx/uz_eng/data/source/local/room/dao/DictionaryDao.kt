@@ -14,10 +14,10 @@ interface DictionaryDao {
     @Query("SELECT * FROM dictionary ORDER BY uzbek")
     fun getAllUzb(): Cursor
 
-    @Query("SELECT * FROM dictionary WHERE dictionary.english LIKE '%' || :word || '%'")
+    @Query("SELECT * FROM dictionary WHERE dictionary.english LIKE :word || '%'")
     fun searchByEng(word: String): Cursor
 
-    @Query("SELECT * FROM dictionary WHERE dictionary.uzbek LIKE '%' || :word || '%'")
+    @Query("SELECT * FROM dictionary WHERE dictionary.uzbek LIKE :word || '%'")
     fun searchByUzb(word: String): Cursor
 
     @Query("SELECT * FROM dictionary WHERE dictionary.is_favourite = 1")

@@ -27,7 +27,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
     private var searchQuery = ""
     private var onShareClickListener: ((DictionaryModel?) -> Unit)? = null
     private var onDetailClickListener: ((DictionaryModel?) -> Unit)? = null
-    private var onSaveClickListener: ((DictionaryModel?) -> Unit)? = null
+    private var onSaveClickListener: ((DictionaryModel?, position: Int) -> Unit)? = null
     private var onCopyClickListener: ((DictionaryModel?) -> Unit)? = null
     private lateinit var balloon: Balloon
 
@@ -80,7 +80,8 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
                 }
                 btnSave.setOnClickListener {
                     binding.btnSave.isSelected = getItem(adapterPosition)?.isFavourite == 1
-                    onSaveClickListener?.invoke(getItem(adapterPosition))
+                    getItem(adapterPosition)?.isFavourite = getItem(adapterPosition)?.isFavourite?.xor(1)
+                    onSaveClickListener?.invoke(getItem(adapterPosition), adapterPosition)
                 }
             }
             binding.root.setOnClickListener {
@@ -161,7 +162,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
         onShareClickListener = listener
     }
 
-    fun setSaveClickLikeListener(like: (DictionaryModel?) -> Unit) {
+    fun setSaveClickLikeListener(like: (DictionaryModel?, position: Int) -> Unit) {
         onSaveClickListener = like
     }
 

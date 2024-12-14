@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -42,35 +42,28 @@ class HomeScreen : Fragment(R.layout.screen_home) {
                 if (menuItem.itemId == R.id.m_paste) viewModel.clickPaste()
                 return@setNavigationItemSelectedListener true
             }
+            btnDraw.setOnClickListener { drawerLayout.open() }
         }
         setupFloatingBalloon()
         observers()
         settingsSearching()
         settingsAdapter()
-        backPressed()
     }
 
     private fun settingsSearching() {
         binding.apply {
-            searchBar.setNavigationOnClickListener { drawerLayout.open() }
-            searchBar.setOnMenuItemClickListener { itemMenu ->
-                when (itemMenu.itemId) {
-                    R.id.m_paste -> viewModel.clickPaste()
+            btnPaste.setOnClickListener { viewModel.clickPaste() }
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    viewModel.searchByWord(query ?: "")
+                    return true
                 }
-                return@setOnMenuItemClickListener true
-            }
-            searchView.setupWithSearchBar(searchBar)
 
-            searchView.editText.setOnEditorActionListener { textView, i, keyEvent ->
-                val text = textView?.text.toString().trim()
-                searchView.hide()
-                searchBar.setText(text)
-                viewModel.searchByWord(text)
-                false
-            }
-            searchView.editText.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) resetSearchView()
-            }
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    viewModel.searchByWord(newText ?: "")
+                    return true
+                }
+            })
         }
     }
 
@@ -82,22 +75,21 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             wordAdapter.apply {
                 setCopyClickListener { it?.english?.copyToClipBoard(requireContext()) }
                 setShareClickListener { requireActivity().shareText(it?.english) }
-                setSaveClickLikeListener { data -> data?.let { viewModel.updateFav(it.id, it.isFavourite!!) } }
+                setSaveClickLikeListener { data, position ->
+                    data?.let {
+                        viewModel.updateFav(it.id, it.isFavourite!!, position)
+                    }
+                }
                 setDetailClickListener { data -> data?.let { viewModel.clickDetail(it) } }
             }
         }
     }
 
     private fun observers() {
-        viewModel.pasteData.observe(viewLifecycleOwner) {
-            binding.apply {
-                searchView.show()
-                searchView.setText(it)
-                searchBar.setText(it)
-                searchView.editText.setSelection(it.length)
-            }
-        }
         lifecycleScope.launch {
+            launch { viewModel.searchQuery.collect { wordAdapter.searchQuery(it) } }
+            launch { viewModel.notifyByPosition.collect { wordAdapter.notifyItemChanged(it) } }
+            launch { viewModel.pasteData.collect { binding.searchView.setQuery(it, false) } }
             launch {
                 viewModel.cursor.collect {
                     binding.apply {
@@ -107,13 +99,12 @@ class HomeScreen : Fragment(R.layout.screen_home) {
                     wordAdapter.submitCursor(it)
                 }
             }
-            launch { viewModel.searchQuery.collect { wordAdapter.searchQuery(it) } }
         }
     }
 
     private fun setupFloatingBalloon() {
         val balloon = Balloon.Builder(requireContext())
-            .setText("Voice search activated!")
+            .setText("Voice search\nactivated!")
             .setTextColorResource(R.color.black)
             .setBackgroundColorResource(R.color.toast)
             .setTextSize(14f)
@@ -132,7 +123,7 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             speechToTextHelper.startListening { results ->
                 if (results.isNotEmpty()) {
                     balloon.dismiss()
-                    binding.searchView.setText(results[0])
+                    binding.searchView.setQuery(results[0], false)
                     viewModel.searchByWord(results[0])
                 }
             }
@@ -151,31 +142,9 @@ class HomeScreen : Fragment(R.layout.screen_home) {
         }
     }
 
-    private fun backPressed() {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (binding.searchView.isShowing) {
-                    binding.searchView.hide() // `SearchView`ni yopamiz
-                } else {
-                    isEnabled = false // Callbackni o'chiramiz
-                    requireActivity().onBackPressed() // Standart xatti-harakatni davom ettiramiz
-                }
-            }
-        })
-    }
-
     override fun onPause() {
         super.onPause()
         speechToTextHelper.stopListening()
         speechToTextHelper.destroy()
-        resetSearchView() // Reset search view when the fragment goes to the background
-    }
-
-    private fun resetSearchView() {
-        binding.apply {
-            searchBar.setText("") // Clear the search bar text
-            searchView.setText("") // Clear the search view text
-            searchView.hide() // Hide the search view
-        }
     }
 }

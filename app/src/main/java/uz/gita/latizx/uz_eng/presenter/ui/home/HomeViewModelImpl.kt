@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uz.gita.latizx.uz_eng.data.model.DictionaryModel
@@ -22,10 +23,11 @@ class HomeViewModelImpl @Inject constructor(
     private val repository: AppRepository,
     private val direction: HomeContract.HomeDirection
 ) : HomeContract.HomeViewModel, ViewModel() {
-    override val pasteData = MutableLiveData<String>()
+    override val pasteData = MutableSharedFlow<String>()
     override val cursor = MutableStateFlow<Cursor?>(null)
     override val searchQuery = MutableStateFlow<String>("")
     override val isEng = MutableLiveData<Boolean>(true)
+    override val notifyByPosition = MutableSharedFlow<Int>()
 
     override fun getCursor() {
         viewModelScope.launch {
@@ -46,23 +48,24 @@ class HomeViewModelImpl @Inject constructor(
         viewModelScope.launch { cursor.value = getCursorByLang() }
     }
 
-    override fun updateFav(id: Int, isFav: Int) {
+    override fun updateFav(id: Int, isFav: Int, position: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateFav(id, isFav.xor(1)).collect {
                 cursor.value = getCursorByLang()
+//                notifyByPosition.emit(position)
             }
         }
     }
 
     override fun clickPaste() {
-        pasteData.value = getClipboardText()
+        viewModelScope.launch { pasteData.emit(getClipboardText()) }
     }
 
     override fun clickDetail(dictionaryModel: DictionaryModel) {
         viewModelScope.launch { direction.moveToDetail(dictionaryModel) }
     }
 
-    private fun getClipboardText(): String? {
+    private fun getClipboardText(): String {
         val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         return clipboard.primaryClip?.getItemAt(0)?.text.toString()
     }

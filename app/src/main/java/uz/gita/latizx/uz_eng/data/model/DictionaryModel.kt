@@ -7,7 +7,7 @@ data class DictionaryModel(
     val transcript: String?,
     val uzbek: String?,
     val countable: String?,
-    val isFavourite: Int?,
+    var isFavourite: Int?,
     val from: String?,
     val date: Long?
 )

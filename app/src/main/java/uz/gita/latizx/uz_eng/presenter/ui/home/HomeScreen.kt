@@ -93,10 +93,8 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             wordAdapter.apply {
                 setCopyClickListener { it?.english?.copyToClipBoard(requireContext()) }
                 setShareClickListener { requireActivity().shareText(it?.english) }
-                setSaveClickLikeListener { data, position ->
-                    data?.let {
-                        viewModel.updateFav(it.id, it.isFavourite!!, position)
-                    }
+                setSaveClickLikeListener { data, _ ->
+                    data?.let { viewModel.updateFav(it) }
                 }
                 setDetailClickListener { data -> data?.let { viewModel.openDetail(it) } }
             }

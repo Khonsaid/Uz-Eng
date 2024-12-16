@@ -23,14 +23,14 @@
         android:icon="@drawable/ic_info"
         android:title="About" />
 
-    <item android:title="Other Options">
-        <menu>
-            <item
-                android:id="@+id/rateApp"
-                android:checkable="true"
-                android:icon="@drawable/icon_home"
-                android:title="Rate the app" />
+<!--    <item android:title="Other Options">-->
+<!--        <menu>-->
+    <item
+        android:id="@+id/rateApp"
+        android:checkable="true"
+        android:icon="@drawable/icon_home"
+        android:title="Rate the app" />
 
-        </menu>
-    </item>
+<!--        </menu>-->
+<!--    </item>-->
 </menu>

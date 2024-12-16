@@ -1,6 +1,5 @@
 package uz.gita.latizx.uz_eng.presenter.ui.detail
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -32,6 +31,7 @@ class DetailViewModelImpl @AssistedInject constructor(
     override val wordDetail = MutableSharedFlow<List<WordDetailModel>>()
     override val word = MutableSharedFlow<DictionaryModel>()
     override val loadVolume = MutableSharedFlow<String>()
+    override val loadSlowlyVolume = MutableSharedFlow<String>()
     override val showCopyMessage = MutableSharedFlow<String>()
     override val shareWord = MutableSharedFlow<String>()
     override val changeSaveState = MutableSharedFlow<Boolean>()
@@ -91,9 +91,13 @@ class DetailViewModelImpl @AssistedInject constructor(
 
     override fun clickVolume() {
         viewModelScope.launch {
-            dictionaryModel?.english?.let {
-                loadVolume.emit(it)
-            }
+            dictionaryModel?.english?.let { loadVolume.emit(it) }
+        }
+    }
+
+    override fun clickSlowly() {
+        viewModelScope.launch {
+            dictionaryModel?.english?.let { loadSlowlyVolume.emit(it) }
         }
     }
 

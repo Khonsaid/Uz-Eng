@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/cl_item_word"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:background="@drawable/bg_item_word">
@@ -33,14 +34,6 @@
             tools:text="hello" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btn_slowly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="4dp"
-            android:src="@drawable/ic_volume_small" />
-
-        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_fast"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,9 +49,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_item_word"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
+        android:background="@drawable/bg_item_word1"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="2dp"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:visibility="gone"

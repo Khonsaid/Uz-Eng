@@ -54,23 +54,12 @@
                     app:layout_constraintTop_toBottomOf="@+id/tv_word">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/btn_fast"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_margin="12dp"
-                        android:background="@drawable/bg_btn_detail"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_volume_loud"
-                        android:tint="@color/white" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/btn_save"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:background="@drawable/bg_btn_detail"
-                        android:padding="8dp"
+                        android:padding="12dp"
                         android:src="@drawable/icon_bookmark"
                         android:tint="@color/white" />
 
@@ -79,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_btn_detail"
-                        android:padding="8dp"
+                        android:padding="12dp"
                         android:src="@drawable/ic_share"
                         android:tint="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/btn_save"
@@ -92,9 +81,63 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:background="@drawable/bg_btn_detail"
-                        android:padding="8dp"
+                        android:padding="12dp"
                         android:src="@drawable/ic_copy"
                         android:tint="@color/white" />
+
+                    <FrameLayout
+                        android:id="@+id/btn_slowly"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginVertical="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_btn_detail"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_volume_small"
+                            android:tint="@color/white" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|bottom"
+                            android:layout_marginEnd="11dp"
+                            android:layout_marginBottom="14dp"
+                            android:text="0.5x"
+                            android:textColor="@color/white"
+                            android:textSize="9sp" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/btn_fast"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginHorizontal="6dp"
+                            android:layout_marginVertical="12dp"
+                            android:background="@drawable/bg_btn_detail"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_volume_loud"
+                            android:tint="@color/white" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|bottom"
+                            android:layout_marginEnd="11dp"
+                            android:layout_marginBottom="14dp"
+                            android:text="1x"
+                            android:textColor="@color/white"
+                            android:textSize="9sp" />
+                    </FrameLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.AppCompatTextView

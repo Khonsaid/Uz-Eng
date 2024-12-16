@@ -9,6 +9,7 @@ interface DetailContract {
         val wordDetail: SharedFlow<List<WordDetailModel>>
         val word: SharedFlow<DictionaryModel>
         val loadVolume: SharedFlow<String>
+        val loadSlowlyVolume: SharedFlow<String>
         val showCopyMessage: SharedFlow<String>
         val shareWord: SharedFlow<String>
         val changeSaveState: SharedFlow<Boolean>
@@ -17,6 +18,7 @@ interface DetailContract {
         fun clickSave()
         fun clickCopy()
         fun clickVolume()
+        fun clickSlowly()
         fun openPrevScreen()
     }
 

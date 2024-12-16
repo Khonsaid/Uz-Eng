@@ -17,7 +17,7 @@ interface HomeContract {
         fun getCursor()
         fun searchByWord(word: String)
         fun updateLang()
-        fun updateFav(id: Int, isFav: Int, position: Int)
+        fun updateFav(dictionaryModel: DictionaryModel)
         fun openPaste()
         fun openFav()
         fun openInfo()

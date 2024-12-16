@@ -55,6 +55,7 @@ class DetailScreen : Fragment(R.layout.screen_detail) {
             btnShare.setOnClickListener { viewModel.clickShare() }
             btnSave.setOnClickListener { viewModel.clickSave() }
             btnCopy.setOnClickListener { viewModel.clickCopy() }
+            btnSlowly.setOnClickListener { viewModel.clickSlowly() }
         }
         observers()
     }
@@ -81,6 +82,14 @@ class DetailScreen : Fragment(R.layout.screen_detail) {
                     ttsHelper.setPitch(1f)
                     ttsHelper.setSpeechRate(1f)
                     ttsHelper.speak(it, onStop = { binding.btnFast.stopScaleAnim() })
+                }
+            }
+            launch {
+                viewModel.loadSlowlyVolume.collect {
+                    binding.btnSlowly.startScaleAnim()
+                    ttsHelper.setPitch(0.6f)
+                    ttsHelper.setSpeechRate(0.5f)
+                    ttsHelper.speak(it, onStop = { binding.btnSlowly.stopScaleAnim() })
                 }
             }
             launch {

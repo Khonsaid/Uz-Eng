@@ -69,15 +69,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
                 }
                 btnShare.setOnClickListener { onShareClickListener?.invoke(getItem(adapterPosition)) }
                 btnDocument.setOnClickListener { onDetailClickListener?.invoke(getItem(adapterPosition)) }
-                btnSlowly.setOnClickListener {
-                    btnSlowly.startScaleAnim()
-                    ttsHelper.setPitch(0.6f)
-                    ttsHelper.setSpeechRate(0.5f)
-                    ttsHelper.speak(
-                        text = getItem(adapterPosition)?.english.toString(),
-                        onStop = { btnSlowly.stopScaleAnim() }
-                    )
-                }
+
                 btnSave.setOnClickListener {
                     binding.btnSave.isSelected = getItem(adapterPosition)?.isFavourite == 1
                     getItem(adapterPosition)?.isFavourite = getItem(adapterPosition)?.isFavourite?.xor(1)
@@ -119,6 +111,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
                 if (isVisible) root.startAnimation(downAnim)
                 else root.startAnimation(upAnim)
                 llTitle.isSelected = isVisible
+                clItemWord.isSelected = isVisible
                 tvType.visibility = if (isVisible) View.VISIBLE else View.GONE
                 tvTranscript.visibility = if (isVisible) View.VISIBLE else View.GONE
                 tvTrans.visibility = if (isVisible) View.VISIBLE else View.GONE

@@ -47,11 +47,12 @@ class HomeViewModelImpl @Inject constructor(
         viewModelScope.launch { cursor.value = getCursorByLang() }
     }
 
-    override fun updateFav(id: Int, isFav: Int, position: Int) {
+    override fun updateFav(data: DictionaryModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateFav(id, isFav.xor(1)).collect {
-                cursor.value = getCursorByLang()
+            repository.updateFav(data.id, data.isFavourite!!.xor(1)).collect {
+                cursor.value = if (isEng.value!!) repository.searchByEngWord(data.english!!) else repository.searchByUzbWord(data.uzbek!!)
 //                notifyByPosition.emit(position)
+
             }
         }
     }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -73,12 +74,12 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             btnPaste.setOnClickListener { viewModel.openPaste() }
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    viewModel.searchByWord(query ?: "")
+                    viewModel.searchByWord(query?.trim() ?: "")
                     return true
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    viewModel.searchByWord(newText ?: "")
+                    viewModel.searchByWord(newText?.trim() ?: "")
                     return true
                 }
             })
@@ -107,12 +108,20 @@ class HomeScreen : Fragment(R.layout.screen_home) {
             launch { viewModel.notifyByPosition.collect { wordAdapter.notifyItemChanged(it) } }
             launch { viewModel.pasteData.collect { binding.searchView.setQuery(it, false) } }
             launch {
-                viewModel.cursor.collect {
-                    binding.apply {
-                        imgSearch.visibility = if ((it?.count ?: 0) > 0) View.GONE else View.VISIBLE
-                        tvSearch.visibility = if ((it?.count ?: 0) > 0) View.GONE else View.VISIBLE
+                viewModel.cursor.collect { cursor ->
+                    cursor?.let {
+                        binding.apply {
+                            imgSearch.visibility = if ((it.count) > 0) View.GONE else View.VISIBLE
+                            tvSearch.visibility = if ((it.count) > 0) View.GONE else View.VISIBLE
+                        }
+                        wordAdapter.submitCursor(it)
                     }
-                    wordAdapter.submitCursor(it)
+                }
+            }
+            launch {
+                viewModel.scrollToPosition.collect {
+                    Log.d("TTT", "observers: $it")
+                    if (it != -1) binding.rvHome.layoutManager?.scrollToPosition(it)
                 }
             }
         }

@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import uz.gita.latizx.uz_eng.R
+import java.util.Locale
 import kotlin.random.Random
 
 class SpeechToTextHelper(

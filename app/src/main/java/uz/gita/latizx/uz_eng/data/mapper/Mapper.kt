@@ -21,6 +21,8 @@ object Mapper {
             date = System.currentTimeMillis(),
         )
 
+    fun Cursor.getId(): Int = this.getInt(this.getColumnIndexOrThrow("id"))
+
     fun DictionaryEntity.toDictionaryModel(): DictionaryModel =
         DictionaryModel(
             id = this.id,

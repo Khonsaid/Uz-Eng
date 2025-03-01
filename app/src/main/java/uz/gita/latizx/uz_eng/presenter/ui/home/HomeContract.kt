@@ -9,6 +9,7 @@ import uz.gita.latizx.uz_eng.data.model.DictionaryModel
 interface HomeContract {
     interface HomeViewModel {
         val pasteData: SharedFlow<String>
+        val scrollToPosition: SharedFlow<Int>
         val cursor: StateFlow<Cursor?>
         val searchQuery: StateFlow<String>
         val isEng: LiveData<Boolean>

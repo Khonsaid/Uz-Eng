@@ -1,7 +1,6 @@
-package uz.gita.latizx.dictionarydemo.data.source.remote.dto
+package uz.gita.latizx.uz_eng.data.source.remote.dto
 
 import uz.gita.latizx.uz_eng.data.model.MeaningModel
-import uz.gita.latizx.uz_eng.data.source.remote.dto.DefinitionDto
 
 data class MeaningDto(
     val antonyms: List<String>?,

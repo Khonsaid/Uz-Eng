@@ -5,12 +5,14 @@ import android.database.Cursor
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import uz.gita.latizx.uz_eng.data.mapper.Mapper.getId
 import uz.gita.latizx.uz_eng.data.model.DictionaryModel
 import uz.gita.latizx.uz_eng.domain.AppRepository
 import uz.gita.latizx.uz_eng.util.getClipboardText
@@ -23,6 +25,7 @@ class HomeViewModelImpl @Inject constructor(
     private val direction: HomeContract.HomeDirection
 ) : HomeContract.HomeViewModel, ViewModel() {
     override val pasteData = MutableSharedFlow<String>()
+    override val scrollToPosition = MutableSharedFlow<Int>()
     override val cursor = MutableStateFlow<Cursor?>(null)
     override val searchQuery = MutableStateFlow<String>("")
     override val isEng = MutableLiveData<Boolean>(true)
@@ -50,11 +53,25 @@ class HomeViewModelImpl @Inject constructor(
     override fun updateFav(data: DictionaryModel) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateFav(data.id, data.isFavourite!!.xor(1)).collect {
-                cursor.value = if (isEng.value!!) repository.searchByEngWord(data.english!!) else repository.searchByUzbWord(data.uzbek!!)
+//                cursor.value = if (isEng.value!!) repository.searchByEngWord(data.english!!) else repository.searchByUzbWord(data.uzbek!!)
 //                notifyByPosition.emit(position)
-
+                cursor.value = getCursorByLang()
+//                scrollToPosition.emit(findPosition(cursor.value, data))
             }
         }
+    }
+
+    private suspend fun findPosition(cursor: Cursor?, data: DictionaryModel): Int {
+        if (cursor == null) return RecyclerView.NO_POSITION
+        for (position in 0 until cursor.count) {
+            cursor.moveToPosition(position)
+            if (cursor.getId() == data.id) {
+                cursor.close()
+                return position
+            }
+        }
+        cursor.close()
+        return RecyclerView.NO_POSITION
     }
 
     override fun openPaste() {

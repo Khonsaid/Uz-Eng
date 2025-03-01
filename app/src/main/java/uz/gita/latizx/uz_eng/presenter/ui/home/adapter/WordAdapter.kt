@@ -2,6 +2,7 @@ package uz.gita.latizx.uz_eng.presenter.ui.home.adapter
 
 import android.annotation.SuppressLint
 import android.database.Cursor
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,7 +82,7 @@ class WordAdapter : RecyclerView.Adapter<WordViewHolder>() {
                     if (lastOpened != -1) notifyItemChanged(lastOpened, Unit)
                     lastOpened = adapterPosition
                 } else lastOpened = -1
-
+                Log.d("TTT", ": ${getItem(adapterPosition)?.id}")
                 changeVisibility(lastOpened == adapterPosition)
                 notifyItemChanged(adapterPosition, Unit)
             }
